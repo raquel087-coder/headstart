@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HEADSTART — Admin System</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">HS</div>
+      <div class="brand-text">
+        <span class="brand-name">HEADSTART</span>
+        <span class="brand-sub">Barbershop · Salon · Spa</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active" data-tab="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-btn" data-tab="clients">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Clients
+      </button>
+      <button class="nav-btn" data-tab="services">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Services
+      </button>
+      <button class="nav-btn" data-tab="appointments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Appointments
+      </button>
+      <button class="nav-btn" data-tab="payments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Payments
+      </button>
+      <button class="nav-btn" data-tab="reports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reports
+      </button>
+      <button class="nav-btn" data-tab="qrcode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="5" y="5" width="3" height="3"/><rect x="16" y="5" width="3" height="3"/><rect x="16" y="16" width="3" height="3"/><rect x="5" y="16" width="3" height="3"/></svg>
+        QR Code
+      </button>
+    </nav>
+    <div class="sidebar-since">Since 2000</div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab-section active">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Welcome back! Here's what's happening today.</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card red">
+          <div class="stat-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div><div class="stat-value" id="statClients">0</div><div class="stat-label">Total Clients</div></div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div><div class="stat-value" id="statAppointmentsToday">0</div><div class="stat-label">Appointments Today</div></div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div><div class="stat-value" id="statRevenueToday">₱0</div><div class="stat-label">Revenue Today</div></div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div><div class="stat-value" id="statRevenueTotal">₱0</div><div class="stat-label">Total Revenue</div></div>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="dash-card">
+          <h3 class="dash-card-title">New Client Submissions</h3>
+          <div id="newSubmissions" class="dash-list"><p class="empty-state">No new submissions.</p></div>
+        </div>
+        <div class="dash-card">
+          <h3 class="dash-card-title">Recent Payments</h3>
+          <div id="recentPayments" class="dash-list"><p class="empty-state">No payments yet.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section id="tab-clients" class="tab-section">
+      <div class="page-header-row">
+        <div><h1 class="page-title">Clients</h1><p class="page-subtitle">All client profiles including online submissions</p></div>
+        <button class="btn-primary" id="btnAddClient">+ Add Client</button>
+      </div>
+      <div class="toolbar">
+        <input type="search" id="clientSearch" placeholder="Search clients..."/>
+        <select id="clientSourceFilter">
+          <option value="all">All Sources</option>
+          <option value="walk-in">Walk-in (Admin)</option>
+          <option value="online">Online Form</option>
+        </select>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Mobile</th><th>Email</th><th>FB Account</th><th>Service Requested</th><th>Date Preferred</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="clientTableBody"><tr><td colspan="10" class="empty-row">No clients yet.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="tab-services" class="tab-section">
+      <div class="page-header-row">
+        <div><h1 class="page-title">Services</h1><p class="page-subtitle">Manage your service menu and pricing</p></div>
+        <button class="btn-primary" id="btnAddService">+ Add Service</button>
+      </div>
+      <div class="services-categories">
+        <button class="cat-btn active" data-cat="all">All</button>
+        <button class="cat-btn" data-cat="Barbershop">💈 Barbershop</button>
+        <button class="cat-btn" data-cat="Salon">💅 Salon</button>
+        <button class="cat-btn" data-cat="Spa">🧖 Spa</button>
+      </div>
+      <div class="services-grid" id="servicesGrid"><p class="empty-state">No services yet.</p></div>
+    </section>
+
+    <!-- APPOINTMENTS -->
+    <section id="tab-appointments" class="tab-section">
+      <div class="page-header-row">
+        <div><h1 class="page-title">Appointments</h1><p class="page-subtitle">Schedule and manage appointments</p></div>
+        <button class="btn-primary" id="btnAddAppointment">+ Book Appointment</button>
+      </div>
+      <div class="toolbar">
+        <input type="search" id="apptSearch" placeholder="Search appointments..."/>
+        <select id="apptStatusFilter">
+          <option value="all">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>#</th><th>Client</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="apptTableBody"><tr><td colspan="7" class="empty-row">No appointments yet.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PAYMENTS -->
+    <section id="tab-payments" class="tab-section">
+      <div class="page-header-row">
+        <div><h1 class="page-title">Payments</h1><p class="page-subtitle">Track all payment records</p></div>
+        <button class="btn-primary" id="btnAddPayment">+ Add Payment</button>
+      </div>
+      <div class="toolbar">
+        <input type="search" id="paySearch" placeholder="Search payments..."/>
+        <select id="payMethodFilter">
+          <option value="all">All Methods</option>
+          <option value="Cash">Cash</option>
+          <option value="GCash">GCash</option>
+          <option value="Card">Card</option>
+        </select>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>#</th><th>Client</th><th>Service</th><th>Amount</th><th>Method</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="payTableBody"><tr><td colspan="7" class="empty-row">No payments yet.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="tab-reports" class="tab-section">
+      <div class="page-header"><h1 class="page-title">Reports</h1><p class="page-subtitle">Business overview and insights</p></div>
+      <div class="reports-grid">
+        <div class="report-card">
+          <h3>Revenue Summary</h3>
+          <div class="report-stat"><span>Today</span><strong id="rToday">₱0</strong></div>
+          <div class="report-stat"><span>This Week</span><strong id="rWeek">₱0</strong></div>
+          <div class="report-stat"><span>This Month</span><strong id="rMonth">₱0</strong></div>
+          <div class="report-stat total"><span>Total</span><strong id="rTotal">₱0</strong></div>
+        </div>
+        <div class="report-card">
+          <h3>Appointments Summary</h3>
+          <div class="report-stat"><span>Total Booked</span><strong id="rApptTotal">0</strong></div>
+          <div class="report-stat"><span>Completed</span><strong id="rApptDone">0</strong></div>
+          <div class="report-stat"><span>Pending</span><strong id="rApptPending">0</strong></div>
+          <div class="report-stat"><span>Cancelled</span><strong id="rApptCancelled">0</strong></div>
+        </div>
+        <div class="report-card">
+          <h3>Top Services</h3>
+          <div id="rTopServices"><p class="empty-state">No data yet.</p></div>
+        </div>
+        <div class="report-card">
+          <h3>Payment Methods</h3>
+          <div class="report-stat"><span>Cash</span><strong id="rCash">₱0</strong></div>
+          <div class="report-stat"><span>GCash</span><strong id="rGcash">₱0</strong></div>
+          <div class="report-stat"><span>Card</span><strong id="rCard">₱0</strong></div>
+        </div>
+      </div>
+      <div class="export-row">
+        <button class="btn-primary" id="btnExportReport">🖨️ Print Report</button>
+      </div>
+    </section>
+
+    <!-- QR CODE -->
+    <section id="tab-qrcode" class="tab-section">
+      <div class="page-header"><h1 class="page-title">QR Code</h1><p class="page-subtitle">Share this QR Code so clients can fill up their info</p></div>
+      <div class="qr-card">
+        <div class="qr-instructions">
+          <div class="qr-step"><div class="qr-step-num">1</div><p>I-post ang QR Code sa counter o entrance ng barbershop</p></div>
+          <div class="qr-step"><div class="qr-step-num">2</div><p>I-scan ng client ang QR Code gamit ang kanilang phone</p></div>
+          <div class="qr-step"><div class="qr-step-num">3</div><p>Mag-fill up sila ng form — makikita mo agad ang data dito sa admin!</p></div>
+        </div>
+        <div class="qr-display">
+          <div class="qr-label">Client Registration Form</div>
+          <div id="qrCodeContainer"></div>
+          <div class="qr-url" id="qrUrl">Loading...</div>
+          <div class="qr-actions">
+            <button class="btn-primary" id="btnPrintQR">🖨️ Print QR Code</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODALS -->
+
+  <!-- Client Modal -->
+  <div class="modal-overlay" id="clientModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="clientModalTitle">Add Client</h2>
+        <button class="modal-close" id="closeClientModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="clientId"/>
+        <div class="form-group"><label>Full Name *</label><input type="text" id="clientName" placeholder="e.g. Juan dela Cruz"/></div>
+        <div class="form-group"><label>Mobile No. *</label><input type="tel" id="clientPhone" placeholder="e.g. 09123456789"/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="clientEmail" placeholder="e.g. juan@email.com"/></div>
+        <div class="form-group"><label>Address</label><input type="text" id="clientAddress" placeholder="e.g. Brgy. San Jose, Manila"/></div>
+        <div class="form-group"><label>FB Account</label><input type="text" id="clientFb" placeholder="e.g. facebook.com/juan"/></div>
+        <div class="form-group"><label>Service Requested</label><input type="text" id="clientService" placeholder="e.g. Haircut"/></div>
+        <div class="form-group"><label>Preferred Date</label><input type="date" id="clientDate"/></div>
+        <div class="form-group"><label>Comments / Suggestions</label><textarea id="clientComments" rows="2" placeholder="Any comments..."></textarea></div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="clientStatus">
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancelClientModal">Cancel</button>
+        <button class="btn-save" id="saveClient">Save Client</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Modal -->
+  <div class="modal-overlay" id="serviceModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="serviceModalTitle">Add Service</h2>
+        <button class="modal-close" id="closeServiceModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="serviceId"/>
+        <div class="form-group"><label>Service Name *</label><input type="text" id="serviceName" placeholder="e.g. Haircut"/></div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="serviceCategory">
+            <option value="">Select category...</option>
+            <option value="Barbershop">💈 Barbershop</option>
+            <option value="Salon">💅 Salon</option>
+            <option value="Spa">🧖 Spa</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Price (₱) *</label><input type="number" id="servicePrice" placeholder="e.g. 150" min="0"/></div>
+        <div class="form-group"><label>Duration (minutes)</label><input type="number" id="serviceDuration" placeholder="e.g. 30" min="1"/></div>
+        <div class="form-group"><label>Description</label><textarea id="serviceDesc" rows="2" placeholder="Brief description..."></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancelServiceModal">Cancel</button>
+        <button class="btn-save" id="saveService">Save Service</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appointment Modal -->
+  <div class="modal-overlay" id="apptModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="apptModalTitle">Book Appointment</h2>
+        <button class="modal-close" id="closeApptModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="apptId"/>
+        <div class="form-group"><label>Client *</label><select id="apptClient"></select></div>
+        <div class="form-group"><label>Service *</label><select id="apptService"></select></div>
+        <div class="form-group"><label>Date *</label><input type="date" id="apptDate"/></div>
+        <div class="form-group"><label>Time *</label><input type="time" id="apptTime"/></div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="apptStatus">
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Notes</label><textarea id="apptNotes" rows="2"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancelApptModal">Cancel</button>
+        <button class="btn-save" id="saveAppt">Save Appointment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div class="modal-overlay" id="payModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="payModalTitle">Add Payment</h2>
+        <button class="modal-close" id="closePayModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="payId"/>
+        <div class="form-group"><label>Client *</label><select id="payClient"></select></div>
+        <div class="form-group"><label>Service *</label><select id="payService"></select></div>
+        <div class="form-group"><label>Amount (₱) *</label><input type="number" id="payAmount" placeholder="e.g. 150" min="0"/></div>
+        <div class="form-group">
+          <label>Payment Method *</label>
+          <select id="payMethod">
+            <option value="Cash">Cash</option>
+            <option value="GCash">GCash</option>
+            <option value="Card">Card</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Date *</label><input type="date" id="payDate"/></div>
+        <div class="form-group"><label>Notes</label><textarea id="payNotes" rows="2"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancelPayModal">Cancel</button>
+        <button class="btn-save" id="savePay">Save Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
