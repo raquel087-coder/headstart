@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HEADSTART — Services Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:       #E82B2B;
+      --red-dark:  #c02020;
+      --red-light: #fdeaea;
+      --blue:      #1B1F8A;
+      --blue-light:#eaebf8;
+      --border:    #e4e4ef;
+      --muted:     #6b6b8a;
+      --text:      #1a1a2e;
+      --bg:        #f7f7fc;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 48px; }
+
+    /* Header */
+    .menu-header {
+      background: var(--blue); padding: 24px 20px 28px;
+      text-align: center; position: relative;
+    }
+    .menu-header::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 5px; background: var(--red);
+    }
+    .menu-logo {
+      width: 110px; height: 110px; object-fit: contain;
+      margin: 0 auto 8px; display: block;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,.3));
+    }
+    .menu-header p { color: rgba(255,255,255,.65); font-size: 13px; letter-spacing: .5px; }
+
+    .menu-container { max-width: 540px; margin: 0 auto; padding: 24px 16px; }
+
+    /* Category tabs */
+    .cat-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .cat-tab {
+      padding: 8px 16px; border: 1.5px solid var(--border); background: #fff;
+      color: var(--muted); border-radius: 20px; font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s;
+    }
+    .cat-tab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .cat-tab:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* Service cards */
+    .services-section { display: flex; flex-direction: column; gap: 10px; }
+
+    .service-item {
+      background: #fff; border-radius: 12px; padding: 16px 18px;
+      border: 1px solid var(--border); display: flex;
+      justify-content: space-between; align-items: center;
+      box-shadow: 0 1px 4px rgba(27,31,138,.06);
+      border-left: 4px solid var(--red);
+    }
+    .service-item-left { flex: 1; }
+    .service-item-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .service-item-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .service-item-price {
+      font-size: 1.2rem; font-weight: 700; color: var(--blue);
+      white-space: nowrap; margin-left: 16px;
+    }
+
+    .cat-section-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--red); margin: 20px 0 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cat-section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .empty-state { color: var(--muted); font-size: 14px; text-align: center; padding: 32px 0; }
+
+    .loading { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--blue-light); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Register button */
+    .register-banner {
+      background: var(--red); border-radius: 14px; padding: 18px 20px;
+      text-align: center; margin-top: 28px; color: #fff;
+    }
+    .register-banner p { font-size: 13px; opacity: .85; margin-bottom: 10px; }
+    .register-btn {
+      display: inline-block; background: #fff; color: var(--red);
+      padding: 10px 24px; border-radius: 8px; font-weight: 700;
+      font-size: 14px; text-decoration: none; cursor: pointer;
+      border: none; font-family: 'Nunito', sans-serif;
+      transition: opacity .2s;
+    }
+    .register-btn:hover { opacity: .85; }
+  </style>
+</head>
+<body>
+
+  <div class="menu-header">
+    <img src="logo.png" alt="HEADSTART Logo" class="menu-logo"/>
+    <p>Barbershop · Salon · Spa — Since 2000</p>
+  </div>
+
+  <div class="menu-container">
+
+    <div class="cat-tabs" id="catTabs">
+      <button class="cat-tab active" data-cat="all">All</button>
+      <button class="cat-tab" data-cat="Barbershop">💈 Barbershop</button>
+      <button class="cat-tab" data-cat="Salon">💅 Salon</button>
+      <button class="cat-tab" data-cat="Spa">🧖 Spa</button>
+    </div>
+
+    <div id="servicesList">
+      <div class="loading">
+        <div class="spinner"></div>
+        Loading services...
+      </div>
+    </div>
+
+    <div class="register-banner">
+      <p>Ready to book? Register as a client now!</p>
+      <button class="register-btn" id="goToForm">📋 Register Here</button>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey            : "AIzaSyD4B7XUX-mqAR2nLGId4gJWpaB-fb8iLnw",
+      authDomain        : "headstart-system.firebaseapp.com",
+      projectId         : "headstart-system",
+      storageBucket     : "headstart-system.firebasestorage.app",
+      messagingSenderId : "643819854035",
+      appId             : "1:643819854035:web:974f2ae0754d4ab48f5c26",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    let allServices = [];
+    let activeCat   = 'all';
+
+    const money = n => '₱' + parseFloat(n||0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+    const catEmoji = { 'Barbershop': '💈', 'Salon': '💅', 'Spa': '🧖' };
+
+    function renderServices() {
+      const list = document.getElementById('servicesList');
+      let services = activeCat === 'all' ? allServices : allServices.filter(s => s.category === activeCat);
+
+      if (!services.length) {
+        list.innerHTML = '<p class="empty-state">No services available yet.</p>';
+        return;
+      }
+
+      if (activeCat === 'all') {
+        // Group by category
+        const groups = {};
+        services.forEach(s => {
+          if (!groups[s.category]) groups[s.category] = [];
+          groups[s.category].push(s);
+        });
+        list.innerHTML = Object.entries(groups).map(([cat, svcs]) => `
+          <div class="cat-section-title">${catEmoji[cat]||''} ${cat}</div>
+          <div class="services-section">
+            ${svcs.map(s => `
+              <div class="service-item">
+                <div class="service-item-left">
+                  <div class="service-item-name">${s.name}</div>
+                  ${s.description ? `<div class="service-item-desc">${s.description}</div>` : ''}
+                </div>
+                <div class="service-item-price">${money(s.price)}</div>
+              </div>`).join('')}
+          </div>`).join('');
+      } else {
+        list.innerHTML = `<div class="services-section">
+          ${services.map(s => `
+            <div class="service-item">
+              <div class="service-item-left">
+                <div class="service-item-name">${s.name}</div>
+                ${s.description ? `<div class="service-item-desc">${s.description}</div>` : ''}
+              </div>
+              <div class="service-item-price">${money(s.price)}</div>
+            </div>`).join('')}
+        </div>`;
+      }
+    }
+
+    // Load services
+    try {
+      const snap = await getDocs(collection(db, 'services'));
+      allServices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderServices();
+    } catch(e) {
+      document.getElementById('servicesList').innerHTML = '<p class="empty-state">Could not load services. Please check your connection.</p>';
+    }
+
+    // Category tabs
+    document.querySelectorAll('.cat-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCat = btn.dataset.cat;
+        renderServices();
+      });
+    });
+
+    // Go to registration form
+    document.getElementById('goToForm').addEventListener('click', () => {
+      window.location.href = 'form.html';
+    });
+  </script>
+</body>
+</html>
