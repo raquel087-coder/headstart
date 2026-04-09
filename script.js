@@ -1,6 +1,7 @@
 /**
  * HEADSTART — Admin System script.js
- * Firebase Firestore for real-time sync
+ * Firebase Firestore — Real-time sync
+ * Updated: Two QR codes, no duration, logo in header
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -25,9 +26,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-// =============================================
-// COLLECTIONS
-// =============================================
 const COL = {
   clients      : 'clients',
   services     : 'services',
@@ -35,20 +33,12 @@ const COL = {
   payments     : 'payments',
 };
 
-// =============================================
-// LOCAL STATE (cached from Firestore)
-// =============================================
-let STATE = {
-  clients      : [],
-  services     : [],
-  appointments : [],
-  payments     : [],
-};
+let STATE = { clients: [], services: [], appointments: [], payments: [] };
 
 // =============================================
 // HELPERS
 // =============================================
-const money  = n => '₱' + parseFloat(n||0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+const money    = n => '₱' + parseFloat(n||0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
 const todayYMD = () => new Date().toISOString().slice(0,10);
 
 function fmtDate(ymd) {
@@ -96,10 +86,11 @@ function initNav() {
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+      const tabEl = document.getElementById(`tab-${btn.dataset.tab}`);
+      if (tabEl) tabEl.classList.add('active');
       if (btn.dataset.tab === 'dashboard') renderDashboard();
       if (btn.dataset.tab === 'reports')   renderReports();
-      if (btn.dataset.tab === 'qrcode')    renderQR();
+      if (btn.dataset.tab === 'qrcode')    renderQRCodes();
     });
   });
 }
@@ -115,25 +106,21 @@ function bindClose(modalId, ...btnIds) {
 }
 
 // =============================================
-// FIRESTORE LISTENERS (real-time)
+// FIRESTORE LISTENERS
 // =============================================
 function initListeners() {
-  // Clients
   onSnapshot(query(collection(db, COL.clients), orderBy('createdAt', 'desc')), snap => {
     STATE.clients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderClients(); renderDashboard();
   });
-  // Services
   onSnapshot(collection(db, COL.services), snap => {
     STATE.services = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderServices(); renderDashboard();
   });
-  // Appointments
   onSnapshot(query(collection(db, COL.appointments), orderBy('createdAt', 'desc')), snap => {
     STATE.appointments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderAppointments(); renderDashboard();
   });
-  // Payments
   onSnapshot(query(collection(db, COL.payments), orderBy('createdAt', 'desc')), snap => {
     STATE.payments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderPayments(); renderDashboard();
@@ -174,7 +161,7 @@ function renderDashboard() {
   document.getElementById('statRevenueToday').textContent      = money(revenueToday);
   document.getElementById('statRevenueTotal').textContent      = money(revenueTotal);
 
-  // New submissions (online form, unread)
+  // New online submissions
   const subContainer = document.getElementById('newSubmissions');
   const newSubs = STATE.clients.filter(c => c.source === 'online').slice(0, 5);
   subContainer.innerHTML = newSubs.length
@@ -209,23 +196,19 @@ function renderDashboard() {
 // =============================================
 // CLIENTS
 // =============================================
-let clientSearchQ  = '';
-let clientSourceQ  = 'all';
+let clientSearchQ = '', clientSourceQ = 'all';
 
 function renderClients() {
   let clients = [...STATE.clients];
   const q = clientSearchQ.toLowerCase();
   if (q) clients = clients.filter(c =>
-    c.name?.toLowerCase().includes(q) ||
-    c.phone?.includes(q) ||
-    c.email?.toLowerCase().includes(q)
+    c.name?.toLowerCase().includes(q) || c.phone?.includes(q) || c.email?.toLowerCase().includes(q)
   );
   if (clientSourceQ !== 'all') clients = clients.filter(c => (c.source || 'walk-in') === clientSourceQ);
 
   const tbody = document.getElementById('clientTableBody');
-  if (!clients.length) {
-    tbody.innerHTML = `<tr><td colspan="10" class="empty-row">No clients found.</td></tr>`; return;
-  }
+  if (!clients.length) { tbody.innerHTML = `<tr><td colspan="10" class="empty-row">No clients found.</td></tr>`; return; }
+
   tbody.innerHTML = clients.map((c, i) => `
     <tr>
       <td>${i+1}</td>
@@ -239,12 +222,8 @@ function renderClients() {
       <td><span class="badge badge-${(c.status||'pending').toLowerCase()}">${c.status||'Pending'}</span></td>
       <td>
         <div class="action-btns">
-          <button class="btn-edit" onclick="editClient('${c.id}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit
-          </button>
-          <button class="btn-delete" onclick="deleteClient('${c.id}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Del
-          </button>
+          <button class="btn-edit" onclick="editClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</button>
+          <button class="btn-delete" onclick="deleteClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Del</button>
         </div>
       </td>
     </tr>`).join('');
@@ -262,9 +241,9 @@ function initClients() {
   bindClose('clientModal', 'closeClientModal', 'cancelClientModal');
 
   document.getElementById('saveClient').addEventListener('click', async () => {
-    const name    = document.getElementById('clientName').value.trim();
-    const phone   = document.getElementById('clientPhone').value.trim();
-    const id      = document.getElementById('clientId').value;
+    const name  = document.getElementById('clientName').value.trim();
+    const phone = document.getElementById('clientPhone').value.trim();
+    const id    = document.getElementById('clientId').value;
     if (!name)  { showToast('⚠️ Please enter client name.'); return; }
     if (!phone) { showToast('⚠️ Please enter phone number.'); return; }
 
@@ -279,15 +258,10 @@ function initClients() {
       status          : document.getElementById('clientStatus').value,
       source          : 'walk-in',
     };
-
     try {
-      if (id) {
-        await updateDoc(doc(db, COL.clients, id), data);
-      } else {
-        await addDoc(collection(db, COL.clients), { ...data, createdAt: serverTimestamp() });
-      }
-      closeModal('clientModal');
-      showToast('✅ Client saved!');
+      if (id) { await updateDoc(doc(db, COL.clients, id), data); }
+      else    { await addDoc(collection(db, COL.clients), { ...data, createdAt: serverTimestamp() }); }
+      closeModal('clientModal'); showToast('✅ Client saved!');
     } catch(e) { showToast('❌ Error: ' + e.message); }
   });
 
@@ -295,7 +269,7 @@ function initClients() {
   document.getElementById('clientSourceFilter').addEventListener('change', e => { clientSourceQ = e.target.value; renderClients(); });
 }
 
-window.editClient = async (id) => {
+window.editClient = (id) => {
   const c = STATE.clients.find(x => x.id === id);
   if (!c) return;
   document.getElementById('clientModalTitle').textContent = 'Edit Client';
@@ -319,7 +293,7 @@ window.deleteClient = async (id) => {
 };
 
 // =============================================
-// SERVICES
+// SERVICES (no duration)
 // =============================================
 let activeCat = 'all';
 
@@ -327,19 +301,15 @@ function renderServices() {
   let services = [...STATE.services];
   if (activeCat !== 'all') services = services.filter(s => s.category === activeCat);
   const grid = document.getElementById('servicesGrid');
-  if (!services.length) {
-    grid.innerHTML = '<p class="empty-state">No services found.</p>'; return;
-  }
+  if (!services.length) { grid.innerHTML = '<p class="empty-state">No services found.</p>'; return; }
+
   grid.innerHTML = services.map(s => `
     <div class="service-card">
       <div class="service-card-cat">${s.category}</div>
       <div class="service-card-name">${s.name}</div>
       <div class="service-card-desc">${s.description||''}</div>
       <div class="service-card-footer">
-        <div>
-          <div class="service-card-price">${money(s.price)}</div>
-          <div class="service-card-duration">${s.duration ? s.duration+' mins' : ''}</div>
-        </div>
+        <div class="service-card-price">${money(s.price)}</div>
         <div class="action-btns">
           <button class="btn-edit" onclick="editService('${s.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -356,7 +326,7 @@ function initServices() {
   document.getElementById('btnAddService').addEventListener('click', () => {
     document.getElementById('serviceModalTitle').textContent = 'Add Service';
     document.getElementById('serviceId').value = '';
-    ['serviceName','servicePrice','serviceDuration','serviceDesc'].forEach(id => document.getElementById(id).value = '');
+    ['serviceName','servicePrice','serviceDesc'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('serviceCategory').value = '';
     openModal('serviceModal');
   });
@@ -373,15 +343,13 @@ function initServices() {
 
     const data = {
       name, category, price,
-      duration   : document.getElementById('serviceDuration').value,
       description: document.getElementById('serviceDesc').value.trim(),
     };
     try {
       if (id) { await updateDoc(doc(db, COL.services, id), data); }
       else    { await addDoc(collection(db, COL.services), data); }
-      closeModal('serviceModal');
-      showToast('✅ Service saved!');
-    } catch(e) { showToast('❌ Error: ' + e.message); }
+      closeModal('serviceModal'); showToast('✅ Service saved!');
+    } catch(e) { showToast('❌ Error saving service: ' + e.message); }
   });
 
   document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -402,7 +370,6 @@ window.editService = (id) => {
   document.getElementById('serviceName').value     = s.name;
   document.getElementById('serviceCategory').value = s.category;
   document.getElementById('servicePrice').value    = s.price;
-  document.getElementById('serviceDuration').value = s.duration||'';
   document.getElementById('serviceDesc').value     = s.description||'';
   openModal('serviceModal');
 };
@@ -647,49 +614,6 @@ function renderReports() {
     : '<p class="empty-state">No data yet.</p>';
 }
 
-// =============================================
-// QR CODE
-// =============================================
-function renderQR() {
-  const formUrl = window.location.href.replace('index.html','').replace(/\/$/, '') + '/form.html';
-  document.getElementById('qrUrl').textContent = formUrl;
-  const container = document.getElementById('qrCodeContainer');
-  container.innerHTML = '';
-
-  // Use QR Server API to generate QR code image
-  const img = document.createElement('img');
-  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(formUrl)}`;
-  img.alt = 'QR Code';
-  img.style.cssText = 'border-radius:12px; border:4px solid #fff; box-shadow:0 4px 16px rgba(27,31,138,.15);';
-  container.appendChild(img);
-}
-
-document.getElementById('btnPrintQR').addEventListener('click', () => {
-  const formUrl = window.location.href.replace('index.html','').replace(/\/$/, '') + '/form.html';
-  const qrSrc   = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(formUrl)}`;
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head><title>HEADSTART QR Code</title>
-    <style>
-      body{font-family:'Segoe UI',sans-serif;text-align:center;padding:40px;color:#1a1a2e}
-      h1{color:#E82B2B;font-size:24px;margin-bottom:4px}
-      p{color:#6b6b8a;font-size:14px;margin-bottom:24px}
-      img{border-radius:16px;border:6px solid #1B1F8A}
-      .url{margin-top:16px;font-size:12px;color:#6b6b8a;word-break:break-all}
-      .instructions{margin-top:20px;font-size:13px;color:#1B1F8A;font-weight:600}
-    </style></head><body>
-    <h1>HEADSTART</h1>
-    <p>Barbershop · Salon · Spa</p>
-    <img src="${qrSrc}" alt="QR Code"/>
-    <div class="instructions">📱 Scan this QR Code to register as a client!</div>
-    <div class="url">${formUrl}</div>
-    </body></html>`);
-  win.document.close();
-  setTimeout(() => win.print(), 800);
-});
-
-// =============================================
-// EXPORT REPORT
-// =============================================
 document.getElementById('btnExportReport').addEventListener('click', () => {
   const payments = STATE.payments;
   const clients  = STATE.clients;
@@ -728,6 +652,68 @@ document.getElementById('btnExportReport').addEventListener('click', () => {
   win.document.write(html); win.document.close();
   setTimeout(() => win.print(), 600);
 });
+
+// =============================================
+// QR CODES — Two QR codes
+// =============================================
+function makeQR(url) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+}
+
+function renderQRCodes() {
+  const base = window.location.href.replace('index.html','').replace(/\/+$/, '');
+
+  // QR 1 — Client Registration Form
+  const formUrl = `${base}/form.html`;
+  document.getElementById('qrClientUrl').textContent = formUrl;
+  document.getElementById('qrClientContainer').innerHTML =
+    `<img src="${makeQR(formUrl)}" alt="Client Form QR" style="width:200px;height:200px;border-radius:10px;border:3px solid #fff;box-shadow:0 4px 16px rgba(27,31,138,.15)"/>`;
+
+  // QR 2 — Services Menu
+  const servicesUrl = `${base}/services.html`;
+  document.getElementById('qrServicesUrl').textContent = servicesUrl;
+  document.getElementById('qrServicesContainer').innerHTML =
+    `<img src="${makeQR(servicesUrl)}" alt="Services QR" style="width:200px;height:200px;border-radius:10px;border:3px solid #fff;box-shadow:0 4px 16px rgba(27,31,138,.15)"/>`;
+}
+
+// Print Client QR
+document.getElementById('btnPrintClientQR').addEventListener('click', () => {
+  const base    = window.location.href.replace('index.html','').replace(/\/+$/, '');
+  const formUrl = `${base}/form.html`;
+  printQR('Client Registration', 'Scan to Register as Client', formUrl, '📋');
+});
+
+// Print Services QR
+document.getElementById('btnPrintServicesQR').addEventListener('click', () => {
+  const base        = window.location.href.replace('index.html','').replace(/\/+$/, '');
+  const servicesUrl = `${base}/services.html`;
+  printQR('Services Menu', 'Scan to View Our Services & Prices', servicesUrl, '💈');
+});
+
+function printQR(title, subtitle, url, emoji) {
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>HEADSTART — ${title}</title>
+    <style>
+      body{font-family:'Segoe UI',sans-serif;text-align:center;padding:48px;color:#1a1a2e;background:#fff}
+      .logo-wrap{margin-bottom:8px}
+      h1{color:#E82B2B;font-size:22px;margin-bottom:2px;letter-spacing:2px}
+      .sub{color:#6b6b8a;font-size:13px;margin-bottom:24px;letter-spacing:.5px}
+      .qr-title{font-size:18px;font-weight:700;color:#1B1F8A;margin-bottom:6px}
+      img.qr{border-radius:16px;border:6px solid #1B1F8A;width:260px;height:260px}
+      .instructions{margin-top:20px;font-size:14px;color:#1B1F8A;font-weight:700}
+      .url{margin-top:10px;font-size:11px;color:#aaa;word-break:break-all}
+      @media print{body{padding:20px}}
+    </style></head><body>
+    <h1>HEADSTART</h1>
+    <p class="sub">Barbershop · Salon · Spa · Since 2000</p>
+    <div class="qr-title">${emoji} ${title}</div>
+    <img class="qr" src="${makeQR(url)}" alt="QR Code"/>
+    <div class="instructions">${subtitle}</div>
+    <div class="url">${url}</div>
+    </body></html>`);
+  win.document.close();
+  setTimeout(() => win.print(), 800);
+}
 
 // =============================================
 // APP INIT
