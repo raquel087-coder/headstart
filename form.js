@@ -26,12 +26,12 @@ const db  = getFirestore(app);
 
 // =============================================
 // LOAD SERVICES FROM FIREBASE
-// (so client can see and choose actual services)
+// So client can see and choose actual services
 // =============================================
 async function loadServices() {
   const servicesList = document.getElementById('servicesList');
   try {
-    const snap = await getDocs(collection(db, 'services'));
+    const snap     = await getDocs(collection(db, 'services'));
     const services = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     if (!services.length) {
@@ -39,7 +39,7 @@ async function loadServices() {
       return;
     }
 
-    // Group by category
+    // Group services by category
     const groups = {};
     services.forEach(s => {
       if (!groups[s.category]) groups[s.category] = [];
@@ -50,28 +50,30 @@ async function loadServices() {
 
     let html = '';
     Object.entries(groups).forEach(([cat, svcs]) => {
-      html += `<div class="service-cat-label">${catEmoji[cat]||''} ${cat}</div>`;
+      html += `<div class="service-cat-label">${catEmoji[cat] || ''} ${cat}</div>`;
       svcs.forEach(s => {
+        const price = parseFloat(s.price).toLocaleString('en-PH', { minimumFractionDigits: 2 });
         html += `
           <label class="service-option">
             <input type="checkbox" name="service" value="${s.name}" />
-            <span>${s.name} — <strong>₱${parseFloat(s.price).toLocaleString()}</strong>${s.duration ? ' · ' + s.duration + ' mins' : ''}</span>
+            <span>${s.name} — <strong>₱${price}</strong></span>
           </label>`;
       });
     });
 
     servicesList.innerHTML = html;
-  } catch(e) {
+
+  } catch (e) {
     servicesList.innerHTML = '<p class="no-services-msg">Could not load services. Please check your connection.</p>';
   }
 }
 
 // =============================================
-// SET MIN DATE (no past dates)
+// SET MIN DATE (no past dates allowed)
 // =============================================
 function setMinDate() {
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById('fDate').min = today;
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('fDate').min   = today;
   document.getElementById('fDate').value = today;
 }
 
@@ -79,24 +81,24 @@ function setMinDate() {
 // FORM SUBMISSION
 // =============================================
 document.getElementById('submitBtn').addEventListener('click', async () => {
-  const name    = document.getElementById('fName').value.trim();
-  const address = document.getElementById('fAddress').value.trim();
-  const phone   = document.getElementById('fPhone').value.trim();
-  const fb      = document.getElementById('fFb').value.trim();
-  const email   = document.getElementById('fEmail').value.trim();
-  const date    = document.getElementById('fDate').value;
+  const name     = document.getElementById('fName').value.trim();
+  const address  = document.getElementById('fAddress').value.trim();
+  const phone    = document.getElementById('fPhone').value.trim();
+  const fb       = document.getElementById('fFb').value.trim();
+  const email    = document.getElementById('fEmail').value.trim();
+  const date     = document.getElementById('fDate').value;
   const comments = document.getElementById('fComments').value.trim();
 
   // Get selected services
-  const checked = document.querySelectorAll('input[name="service"]:checked');
+  const checked          = document.querySelectorAll('input[name="service"]:checked');
   const selectedServices = Array.from(checked).map(c => c.value);
 
   // Validation
-  if (!name)    { alert('Please enter your full name.'); return; }
-  if (!address) { alert('Please enter your address.'); return; }
-  if (!phone)   { alert('Please enter your mobile number.'); return; }
-  if (selectedServices.length === 0) { alert('Please select at least one service.'); return; }
-  if (!date)    { alert('Please select your preferred date.'); return; }
+  if (!name)                       { alert('Please enter your full name.');              return; }
+  if (!address)                    { alert('Please enter your address.');                return; }
+  if (!phone)                      { alert('Please enter your mobile number.');          return; }
+  if (selectedServices.length === 0) { alert('Please select at least one service.');    return; }
+  if (!date)                       { alert('Please select your preferred date.');        return; }
 
   // Show loading
   document.getElementById('loadingOverlay').classList.add('show');
@@ -117,10 +119,11 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
       createdAt        : serverTimestamp(),
     });
 
-    // Hide form, show success
-    document.getElementById('formContent').style.display    = 'none';
-    document.getElementById('successScreen').style.display  = 'block';
-  } catch(e) {
+    // Hide form, show success message
+    document.getElementById('formContent').style.display   = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+
+  } catch (e) {
     alert('Something went wrong. Please try again.\n' + e.message);
     document.getElementById('submitBtn').disabled = false;
   } finally {
