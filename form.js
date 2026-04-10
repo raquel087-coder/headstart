@@ -5,7 +5,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, getDocs, serverTimestamp
+  getFirestore, collection, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // =============================================
@@ -24,49 +24,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-// =============================================
-// LOAD SERVICES FROM FIREBASE
-// So client can see and choose actual services
-// =============================================
-async function loadServices() {
-  const servicesList = document.getElementById('servicesList');
-  try {
-    const snap     = await getDocs(collection(db, 'services'));
-    const services = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    if (!services.length) {
-      servicesList.innerHTML = '<p class="no-services-msg">No services available yet. Please contact the shop.</p>';
-      return;
-    }
-
-    // Group services by category
-    const groups = {};
-    services.forEach(s => {
-      if (!groups[s.category]) groups[s.category] = [];
-      groups[s.category].push(s);
-    });
-
-    const catEmoji = { 'Barbershop': '💈', 'Salon': '💅', 'Spa': '🧖' };
-
-    let html = '';
-    Object.entries(groups).forEach(([cat, svcs]) => {
-      html += `<div class="service-cat-label">${catEmoji[cat] || ''} ${cat}</div>`;
-      svcs.forEach(s => {
-        const price = parseFloat(s.price).toLocaleString('en-PH', { minimumFractionDigits: 2 });
-        html += `
-          <label class="service-option">
-            <input type="checkbox" name="service" value="${s.name}" />
-            <span>${s.name} — <strong>₱${price}</strong></span>
-          </label>`;
-      });
-    });
-
-    servicesList.innerHTML = html;
-
-  } catch (e) {
-    servicesList.innerHTML = '<p class="no-services-msg">Could not load services. Please check your connection.</p>';
-  }
-}
 
 // =============================================
 // SET MIN DATE (no past dates allowed)
@@ -89,16 +47,11 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
   const date     = document.getElementById('fDate').value;
   const comments = document.getElementById('fComments').value.trim();
 
-  // Get selected services
-  const checked          = document.querySelectorAll('input[name="service"]:checked');
-  const selectedServices = Array.from(checked).map(c => c.value);
-
   // Validation
-  if (!name)                       { alert('Please enter your full name.');              return; }
-  if (!address)                    { alert('Please enter your address.');                return; }
-  if (!phone)                      { alert('Please enter your mobile number.');          return; }
-  if (selectedServices.length === 0) { alert('Please select at least one service.');    return; }
-  if (!date)                       { alert('Please select your preferred date.');        return; }
+  if (!name)    { alert('Please enter your full name.');     return; }
+  if (!address) { alert('Please enter your address.');       return; }
+  if (!phone)   { alert('Please enter your mobile number.'); return; }
+  if (!date)    { alert('Please select your preferred date.'); return; }
 
   // Show loading
   document.getElementById('loadingOverlay').classList.add('show');
@@ -111,7 +64,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
       phone,
       fbAccount        : fb,
       email,
-      serviceRequested : selectedServices.join(', '),
+      serviceRequested : '',  // Client selects service at the shop
       preferredDate    : date,
       comments,
       source           : 'online',   // marks this as online submission
@@ -135,6 +88,5 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
 // INIT
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
-  loadServices();
   setMinDate();
 });
