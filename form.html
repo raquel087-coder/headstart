@@ -70,22 +70,7 @@
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue); }
     .form-group textarea { resize: vertical; min-height: 80px; }
 
-    .services-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-    .service-option {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px; border: 1.5px solid var(--border);
-      border-radius: 8px; cursor: pointer; transition: border-color .2s, background .2s;
-      font-size: 14px; font-weight: 600;
-    }
-    .service-option input[type="checkbox"] {
-      width: 18px; height: 18px; accent-color: var(--red);
-      flex-shrink: 0; padding: 0; border: none;
-    }
-    .service-option:has(input:checked) { border-color: var(--red); background: #fdeaea; }
-    .service-cat-label {
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 1px; color: var(--red); margin: 12px 0 6px;
-    }
+
 
     .submit-btn {
       width: 100%; padding: 14px; background: var(--red); color: #fff;
@@ -114,7 +99,7 @@
     .spinner { width: 36px; height: 36px; border: 4px solid var(--blue-light); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .required-note { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-    .no-services-msg { color: var(--muted); font-size: 14px; padding: 12px 0; font-style: italic; }
+
   </style>
 </head>
 <body>
@@ -135,12 +120,7 @@
         <div class="form-group"><label>Mobile No. *</label><input type="tel" id="fPhone" placeholder="e.g. 09123456789"/></div>
         <div class="form-group"><label>Facebook Account</label><input type="text" id="fFb" placeholder="e.g. facebook.com/yourname"/></div>
         <div class="form-group"><label>Email Address</label><input type="email" id="fEmail" placeholder="e.g. yourname@email.com"/></div>
-        <div class="form-group">
-          <label>Service/s Requested *</label>
-          <div id="servicesList" class="services-list">
-            <p class="no-services-msg">Loading services...</p>
-          </div>
-        </div>
+
         <div class="form-group"><label>Preferred Date *</label><input type="date" id="fDate"/></div>
         <div class="form-group"><label>Comments / Suggestions</label><textarea id="fComments" placeholder="Any comments or suggestions for us?"></textarea></div>
         <button class="submit-btn" id="submitBtn">Submit Registration</button>
